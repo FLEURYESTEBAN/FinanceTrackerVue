@@ -6,6 +6,7 @@ import SubscriptionManag from '../Views/SubscriptionManag.vue'
 import LoginPage from '../Views/LoginPage.vue'
 import CreateAccount from '../Views/CreateAccount.vue'
 import ForgotPasswd from '../Views/ForgotPasswd.vue'
+import Tasks from '../Views/Tasks.vue'
 
 const routes = [
   {
@@ -38,6 +39,11 @@ const routes = [
     path: '/SubscriptionManag',
     name: 'SubscriptionManag',
     component: SubscriptionManag
+  },
+  {
+    path: '/tasks',
+    name: 'Tasks',
+    component: Tasks
   }
 ]
 

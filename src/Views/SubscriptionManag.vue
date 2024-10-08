@@ -94,6 +94,7 @@ export default {
         planType: ''
       },
       subscriptions: [] // List to store subscriptions
+
     }
   },
   mounted () {

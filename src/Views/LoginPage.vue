@@ -83,9 +83,9 @@ export default {
         } else {
           // Handle errors
           if (response.status === 401) {
-            alert('Incorrect password')
+            alert('Incorrect Credentials')
           } else if (response.status === 404) {
-            alert('User not found')
+            alert('Incorrect Credentials')
           } else {
             alert('An error occurred. Please try again.')
           }

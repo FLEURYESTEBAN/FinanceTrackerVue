@@ -74,7 +74,7 @@
             <router-link to="/SubscriptionManag" class="hover:text-gray-500">Your subscriptions</router-link>
             <ul>
         <li v-for="(sub, index) in subscriptions" :key="index">
-          {{ sub.name }} - {{ sub.price }} $ - {{ sub.nextPayment }} - {{ sub.planType }}
+          {{ sub.name }} - {{ sub.price }} $ - {{ formatDate(sub.nextPayment) }} - {{ sub.planType }}
         </li>
       </ul>
           </div>
