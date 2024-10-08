@@ -19,9 +19,10 @@ const routes = [
     component: LoginPage
   },
   {
-    path: '/SmartBanking',
+    path: '/smart-banking',
     name: 'SmartBanking',
-    component: SmartBanking
+    component: SmartBanking,
+    props: route => ({ totalExpenses: route.params.totalExpenses }) // Pass the prop
   },
   {
     path: '/CreateAccount',

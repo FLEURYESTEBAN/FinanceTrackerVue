@@ -17,6 +17,14 @@ const UserSchema = new mongoose.Schema({
     fullName: String,
     balance: Number,
     expenses: Number,
+    Subscription: [
+        {
+        name:String,
+        price:Number,
+        paymentDate: Date,
+        planType: String
+        }
+    ],
     Allexpenses: [
         {
             Name: String, // Name of the expense
@@ -146,6 +154,58 @@ app.post('/remove-expense', async (req, res) => {
 
 app.post('/add-subscription', async (req, res) => {
     const { username, subscription } = req.body; // Expect username and subscription object
+  
+    try {
+      const user = await UserModel.findOne({ username });
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      // Add the new subscription to the user's Subscription array
+      user.Subscription.push(subscription);
+  
+      await user.save(); // Save the updated user data
+  
+      res.status(200).json({
+        message: 'Subscription added successfully',
+        subscription: user.Subscription[user.Subscription.length - 1] // Return the newly added subscription
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+app.post('/get-subscriptions', async (req, res) => {
+    const { username } = req.body;
+  
+    console.log('Fetching subscriptions for:', username); // Log the username
+  
+    if (!username) {
+      return res.status(400).json({ message: 'Username is required' });
+    }
+  
+    try {
+      const user = await UserModel.findOne({ username });
+  
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+  
+      console.log('Subscriptions found:', user.Subscription); // Log the subscriptions
+  
+      res.status(200).json({
+        subscriptions: user.Subscription
+      });
+    } catch (error) {
+      console.error('Error fetching subscriptions:', error);
+      res.status(500).json({ message: 'Server error' });
+    }
+  });
+
+  app.post('/remove-subscription', async (req, res) => {
+    const { username, subscriptionId } = req.body;
 
     try {
         const user = await UserModel.findOne({ username });
@@ -154,15 +214,19 @@ app.post('/add-subscription', async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Add the new subscription to the user's Subscription array
-        user.Subscription.push(subscription);
+        // Find the index of the subscription to remove
+        const subscriptionIndex = user.Subscription.findIndex(sub => sub._id == subscriptionId);
+
+        if (subscriptionIndex === -1) {
+            return res.status(404).json({ message: 'Subscription not found' });
+        }
+
+        // Remove the subscription from the array
+        user.Subscription.splice(subscriptionIndex, 1);
 
         await user.save(); // Save the updated user data
 
-        res.status(200).json({
-            message: 'Subscription added successfully',
-            subscription: user.Subscription[user.Subscription.length - 1], // Return the newly added subscription
-        });
+        res.status(200).json({ message: 'Subscription removed successfully' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error' });

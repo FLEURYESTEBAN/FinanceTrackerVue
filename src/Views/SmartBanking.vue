@@ -17,11 +17,11 @@
         <div class="grid grid-cols-2 gap-6 px-10">
           <div class="bg-gray-100 rounded-xl p-6 text-center shadow-md">
             <p class="uppercase text-sm font-semibold text-gray-600">This Month</p>
-            <p class="text-3xl font-bold text-red-600">-$14200</p>
+            <p class="text-3xl font-bold text-red-600">${{ displayedExpenses }}</p>
           </div>
           <div class="bg-gray-100 rounded-xl p-6 text-center shadow-md">
             <p class="uppercase text-sm font-semibold text-gray-600">Last Month</p>
-            <p class="text-3xl font-bold text-green-600">-$10000</p>
+            <p class="text-3xl font-bold text-green-600">${{ displayedLastMonthExpenses }}</p>
           </div>
         </div>
 
@@ -42,10 +42,10 @@
         <!-- Monthly Comparison -->
         <div class="grid grid-cols-2 gap-6 px-10">
           <div class="bg-gray-100 rounded-xl p-6 text-center shadow-md">
-            <p class="text-lg font-semibold text-gray-800">You are using more money than last month</p>
+            <p class="text-lg font-semibold text-gray-800">{{ comparisonMessage }}</p>
           </div>
           <div class="bg-gray-100 rounded-xl p-6 text-center shadow-md">
-            <p class="text-3xl font-bold text-red-600">-$4200</p>
+            <p class="text-3xl font-bold text-red-600">-${{ Math.abs(expenseDifference) }}</p>
           </div>
         </div>
 
@@ -73,10 +73,28 @@ import { Chart, registerables } from 'chart.js'
 Chart.register(...registerables)
 
 export default {
-  name: 'FinanceTracker',
+  name: 'SmartBanking',
+  props: ['totalExpenses'], // Receive the totalExpenses as a prop
   data () {
     return {
-      chartInstance: null // Store the chart instance for later use
+      localTotalExpenses: this.totalExpenses, // Create a local copy of the prop
+      lastMonthExpenses: 10000 // Set last month's expenses (this can be dynamic)
+    }
+  },
+  computed: {
+    displayedExpenses () {
+      return parseFloat(this.localTotalExpenses).toLocaleString() // Format for display
+    },
+    displayedLastMonthExpenses () {
+      return parseFloat(this.lastMonthExpenses).toLocaleString() // Format for display
+    },
+    expenseDifference () {
+      return this.localTotalExpenses - this.lastMonthExpenses // Calculate the difference
+    },
+    comparisonMessage () {
+      return this.expenseDifference > 0
+        ? 'You are using more money than last month'
+        : 'You are using less money than last month'
     }
   },
   mounted () {
@@ -107,7 +125,7 @@ export default {
     },
     renderChart () {
       const ctx = this.$refs.expenseChart.getContext('2d')
-      this.chartInstance = new Chart(ctx, { // Store the chart instance
+      this.chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: ['January', 'February', 'March', 'April', 'May', 'June'],
@@ -117,7 +135,7 @@ export default {
             borderColor: 'rgba(75, 192, 192, 1)',
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
             fill: true,
-            tension: 0.1 // Adds a slight curve to the line
+            tension: 0.1
           }]
         },
         options: {
@@ -142,7 +160,6 @@ export default {
     }
   }
 }
-
 </script>
 
 <style scoped>

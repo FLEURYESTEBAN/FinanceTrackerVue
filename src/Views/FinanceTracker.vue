@@ -23,62 +23,68 @@
         </div>
       </div>
 
-      <!-- Expense Table -->
-      <div class="mt-5 mb-5 border rounded-lg overflow-hidden max-h-64 overflow-y-auto relative drop-shadow-md">
-        <table class="min-w-full max-w-6xl text-left text-sm bg-gray-100 table-fixed">
-          <tbody>
-            <!-- Group expenses by date -->
-            <template v-for="(expenseGroup, index) in groupedExpenses" :key="index">
-              <!-- Date Row -->
-              <tr class="bg-neutral-200">
-                <td colspan="3" class="px-6 py-2 font-semibold text-left">{{ formatDate(expenseGroup.date) }}</td>
-              </tr>
-              <!-- Transactions -->
-              <tr v-for="(expense, expenseIndex) in expenseGroup.expenses" :key="expenseIndex">
-                <td class="w-1/3 whitespace-nowrap px-6 py-2 text-left">{{ expense.Name }}</td>
-                <td class="w-1/3 whitespace-nowrap px-6 py-2 italic font-thin text-center">{{ formatTime(expense.Date) }}</td>
-                <td class="w-1/3 whitespace-nowrap px-6 py-2 text-right" :class="expense.Price < 0 ? 'text-red-600' : 'text-green-600'">
-                  {{ formatPrice(expense.Price) }}
-                </td>
-              </tr>
-            </template>
+<!-- Expense Table and Add Expense Form -->
+<div class="mt-5 mb-5 border rounded-lg overflow-hidden max-h-64 overflow-y-auto relative drop-shadow-md">
+  <table class="min-w-full max-w-6xl text-left text-sm bg-gray-100 table-fixed">
+    <tbody>
+      <!-- Group expenses by date -->
+      <template v-for="(expenseGroup, index) in groupedExpenses" :key="index">
+        <!-- Date Row -->
+        <tr class="bg-neutral-200">
+          <td colspan="4" class="px-6 py-2 font-semibold text-left">{{ formatDate(expenseGroup.date) }}</td>
+        </tr>
+        <!-- Transactions -->
+        <tr v-for="(expense, expenseIndex) in expenseGroup.expenses" :key="expenseIndex">
+          <td class="w-1/4 whitespace-nowrap px-6 py-2 text-left">{{ expense.Name }}</td>
+          <td class="w-1/4 whitespace-nowrap px-6 py-2 italic font-thin text-center">{{ formatTime(expense.Date) }}</td>
+          <td class="w-1/4 whitespace-nowrap px-6 py-2 text-right" :class="expense.Price < 0 ? 'text-red-600' : 'text-green-600'">
+            {{ formatPrice(expense.Price) }}
+          </td>
+        </tr>
+      </template>
+    </tbody>
+  </table>
 
-            <!-- Add Expense Form -->
-            <tr class="bg-gray-50">
-              <td colspan="3" class="px-6 py-4">
-                <div class="flex space-x-4">
-                  <input type="text" v-model="newExpenseName" placeholder="Expense Name" class="flex-1 p-3 rounded-lg border border-gray-300"/>
-                  <input type="number" v-model="newExpensePrice" placeholder="Amount" class="flex-1 p-3 rounded-lg border border-gray-300"/>
-                  <button @click="addExpense" class="bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded-lg">Add</button>
-                </div>
-              </td>
-            </tr>
-
-            <!-- Footer Row -->
-            <tr>
-              <td colspan="3" class="px-6 py-4 text-right">
-                <span class="flex justify-end space-x-4">
-                  <button @click="removeLastExpense" class="bg-gray-800 text-white py-2 px-4 rounded-lg shadow-md hover:bg-beige transition-colors duration-300">Remove</button>
-                </span>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
+</div>
+<div class="flex space-x-4 mb-4">
+    <input type="text" v-model="newExpenseName" placeholder="Expense Name" class="flex-1 p-3 rounded-lg border border-gray-300" />
+    <input type="number" v-model="newExpensePrice" placeholder="Amount" class="flex-1 p-3 rounded-lg border border-gray-300" />
+    <button @click="addExpense" class="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-2 rounded-lg">Add</button>
+  </div>
+<div class="overflow-hidden rounded-lg border mb-4 shadow-md">
+    <table class="min-w-full bg-gray-100">
+      <tbody>
+        <!-- Table content goes here -->
+        <!-- Footer Row -->
+        <tr>
+          <td colspan="4" class="px-6 py-4 text-right">
+            <div class="flex justify-end">
+              <button @click="removeLastExpense" class="flex-1 bg-gray-800 text-white py-2 rounded-lg shadow-md hover:bg-beige transition-colors duration-300">Remove</button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
       <!-- Additional Information Sections -->
       <section class="grid gap-6 md:grid-cols-2">
         <!-- Subscriptions -->
         <div class="bg-gray-100 p-6 rounded-lg shadow-md">
           <div class="text-center text-lg font-semibold text-gray-800">
             <router-link to="/SubscriptionManag" class="hover:text-gray-500">Your subscriptions</router-link>
+            <ul>
+        <li v-for="(sub, index) in subscriptions" :key="index">
+          {{ sub.name }} - {{ sub.price }} $ - {{ sub.nextPayment }} - {{ sub.planType }}
+        </li>
+      </ul>
           </div>
-          <img src="chart-placeholder.png" alt="Chart of subscriptions" class="mt-4 w-full h-40 object-cover rounded-lg">
         </div>
         <!-- Smart Banking -->
         <div class="bg-gray-100 p-6 rounded-lg shadow-md">
           <div class="text-center text-lg font-semibold text-gray-800">
-            <router-link to="/SmartBanking" class="hover:text-gray-500">Your smart banking</router-link>
+            <router-link :to="{ name: 'SmartBanking', params: { totalExpenses: totalExpenses }}">
+              <button>Go to Smart Banking</button>
+            </router-link>
           </div>
           <p class="mt-4 text-center text-gray-600">This month, you used 50% more on groceries and 20% less on family expenses.</p>
         </div>
@@ -100,29 +106,46 @@ export default {
       fullName: '',
       balance: 0,
       Allexpenses: [],
-      totalExpenses: 0,
+      totalExpenses: this.totalExpenses,
       groupedExpenses: [],
-      newExpenseName: '', // New data property for the expense name
-      newExpensePrice: 0 // New data property for the expense price
+      newExpenseName: '',
+      newExpensePrice: 0,
+      subscriptions: [] // List to store subscriptions
     }
   },
+  mounted () {
+    this.fetchSubscriptions() // Fetch subscriptions when the component is mounted
+  },
   created () {
-  // Fetch data from query params or localStorage if available
     this.username = this.$route.query.username || localStorage.getItem('username') || ''
     this.fullName = this.$route.query.fullName || localStorage.getItem('fullName') || 'Guest'
 
-    // Retrieve the expenses data from query params or localStorage
     const expensesData = this.$route.query.Allexpenses || localStorage.getItem('Allexpenses') || '[]'
-
-    // Parse and set Allexpenses
     this.Allexpenses = JSON.parse(expensesData)
 
-    // Now calculate the total expenses and balance after setting Allexpenses
     this.groupedExpenses = this.groupExpensesByDate(this.Allexpenses)
     this.totalExpenses = this.calculateTotalExpenses(this.Allexpenses)
-    this.balance = this.calculateBalance(this.Allexpenses) || '/' // Fallback to '/' if no balance
+    this.balance = this.calculateBalance(this.Allexpenses) || '/'
+    this.updateTotals()
   },
   methods: {
+    fetchSubscriptions () {
+      const username = this.username || localStorage.getItem('username')
+
+      if (username) {
+        fetch('http://localhost:3001/get-subscriptions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username })
+        })
+          .then(res => res.json())
+          .then(data => {
+            this.subscriptions = data.subscriptions // Store the fetched subscriptions
+            localStorage.setItem('subscriptions', JSON.stringify(this.subscriptions)) // Store in localStorage if needed
+          })
+          .catch(err => console.error('Error fetching subscriptions:', err))
+      }
+    },
     // Group expenses by date
     groupExpensesByDate (expenses) {
       const grouped = []
@@ -184,14 +207,11 @@ export default {
           const data = await response.json()
           this.Allexpenses.push(data.expense)
 
-          // Update balance based on the nature of the new expense
-          this.balance = this.calculateBalance(this.Allexpenses) // Calculate balance after adding the new expense
+          // Save updated expenses to localStorage
+          localStorage.setItem('Allexpenses', JSON.stringify(this.Allexpenses))
 
-          // Recalculate total expenses
-          this.totalExpenses = this.calculateTotalExpenses(this.Allexpenses)
-
-          // Group expenses by date
-          this.groupedExpenses = this.groupExpensesByDate(this.Allexpenses)
+          // Update balance and total expenses
+          this.updateTotals()
 
           // Clear input fields
           this.newExpenseName = ''
@@ -224,19 +244,25 @@ export default {
         })
 
         if (response.ok) {
-        // Remove last expense from the array
+          // Remove last expense from the array
           this.Allexpenses.pop()
 
+          // Save updated expenses to localStorage
+          localStorage.setItem('Allexpenses', JSON.stringify(this.Allexpenses))
+
           // Update balance and total expenses
-          this.balance = this.calculateBalance(this.Allexpenses)
-          this.totalExpenses = this.calculateTotalExpenses(this.Allexpenses)
-          this.groupedExpenses = this.groupExpensesByDate(this.Allexpenses)
+          this.updateTotals()
         } else {
           console.error('Error removing expense:', await response.json())
         }
       } catch (error) {
         console.error('Error removing expense:', error)
       }
+    },
+    updateTotals () {
+      this.balance = this.calculateBalance(this.Allexpenses)
+      this.totalExpenses = this.calculateTotalExpenses(this.Allexpenses)
+      this.groupedExpenses = this.groupExpensesByDate(this.Allexpenses)
     }
   }
 }

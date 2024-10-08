@@ -67,6 +67,7 @@ export default {
           localStorage.setItem('fullName', data.fullName)
           localStorage.setItem('balance', data.balance)
           localStorage.setItem('Allexpenses', JSON.stringify(data.Allexpenses)) // Use data.Allexpenses instead
+          localStorage.setItem('Subscription', JSON.stringify(data.Subscription))
 
           // Redirect to FinanceTracker and pass data as props
           this.$router.push({
@@ -75,7 +76,8 @@ export default {
               username: data.username,
               fullName: data.fullName,
               balance: data.balance,
-              Allexpenses: JSON.stringify(data.Allexpenses) // Pass Allexpenses as JSON string
+              Allexpenses: JSON.stringify(data.Allexpenses), // Pass Allexpenses as JSON string
+              Subscription: JSON.stringify(data.Subscription)
             }
           })
         } else {
