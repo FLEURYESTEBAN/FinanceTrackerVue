@@ -151,7 +151,7 @@ export default {
             x: {
               title: {
                 display: true,
-                text: 'Months'
+                text: 'Days'
               }
             }
           }

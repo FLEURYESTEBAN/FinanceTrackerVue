@@ -78,7 +78,7 @@ export default {
     async createAccount () {
       // Validate the password
       if (!this.validatePassword(this.credentials.password)) {
-        alert('Password must contain at least 8 characters, including one number, and one special character.')
+        alert('Password must contain at least 8 characters and one number.')
         return
       }
 

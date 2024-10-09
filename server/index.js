@@ -24,7 +24,7 @@ const UserSchema = new mongoose.Schema({
         {
         name:String,
         price:Number,
-        paymentDate: Date,
+        nextpayment: Date,
         planType: String
         }
     ],
@@ -58,7 +58,6 @@ app.post('/login', async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Compare the password using bcrypt
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (isPasswordValid) {
@@ -190,11 +189,18 @@ app.post('/add-subscription', async (req, res) => {
         return res.status(404).json({ message: 'User not found' });
       }
   
+      // Log the incoming subscription
+      console.log('New subscription to add:', subscription);
+      
       // Add the new subscription to the user's Subscription array
       user.Subscription.push(subscription);
-  
+      
       await user.save(); // Save the updated user data
+      
+      // Log subscriptions after addition
+      console.log('User subscriptions after adding:', user.Subscription);
   
+      // Return the newly added subscription
       res.status(200).json({
         message: 'Subscription added successfully',
         subscription: user.Subscription[user.Subscription.length - 1] // Return the newly added subscription
@@ -204,6 +210,7 @@ app.post('/add-subscription', async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   });
+  
 
 app.post('/get-subscriptions', async (req, res) => {
     const { username } = req.body;

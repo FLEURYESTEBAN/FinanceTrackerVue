@@ -68,13 +68,6 @@ export default {
           const data = await response.json()
           console.log('API Response:', data) // Check if data is received correctly
 
-          // Save data locally (for persistence across pages)
-          localStorage.setItem('username', data.username) // Ensure 'username' is returned from the backend
-          localStorage.setItem('fullName', data.fullName)
-          localStorage.setItem('balance', data.balance)
-          localStorage.setItem('Allexpenses', JSON.stringify(data.Allexpenses)) // Use data.Allexpenses instead
-          localStorage.setItem('Subscription', JSON.stringify(data.Subscription))
-
           // Redirect to FinanceTracker and pass data as props
           this.$router.push({
             path: '/Finance',

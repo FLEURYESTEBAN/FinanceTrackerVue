@@ -61,7 +61,7 @@
               <tr v-for="(sub, index) in subscriptions" :key="index">
                 <td class="py-2">{{ sub.name }}</td>
                 <td class="py-2">{{ sub.price }} $</td>
-                <td class="py-2">{{ sub.paymentDate }}</td>
+                <td class="py-2">{{ sub.nextPayment }}</td>
                 <td class="py-2">{{ sub.planType }}</td>
                 <td class="py-2">
                   <button @click="removeSubscription(index)" class="bg-red-600 hover:bg-red-500 text-white py-1 px-3 rounded-lg shadow">Remove</button>
@@ -93,7 +93,6 @@ export default {
         planType: ''
       },
       subscriptions: [] // List to store subscriptions
-
     }
   },
   mounted () {
@@ -103,14 +102,26 @@ export default {
     async addSubscription () {
       if (this.subscription.name && this.subscription.price && this.subscription.nextPayment && this.subscription.planType) {
         try {
+          // Convert nextPayment to ISO string (full date-time format)
+          const nextPaymentDate = new Date(this.subscription.nextPayment)
+          const formattedNextPayment = nextPaymentDate.toISOString() // Send the full ISO string
+
+          const subscriptionData = {
+            ...this.subscription,
+            nextPayment: formattedNextPayment // Send the full ISO string for nextPayment
+          }
+
+          console.log('Before sending:', subscriptionData)
+
           const response = await axios.post('http://localhost:3001/add-subscription', {
-            username: localStorage.getItem('username'), // Assuming you store the username in localStorage
-            subscription: this.subscription
+            username: localStorage.getItem('username'),
+            subscription: subscriptionData
           })
 
           this.subscriptions.push(response.data.subscription) // Add the new subscription
+          console.log('After response:', response.data.subscription)
 
-          // Clear the subscription form
+          // Reset subscription form
           this.subscription = {
             name: '',
             price: null,
@@ -124,7 +135,6 @@ export default {
         alert('Please fill out all fields before adding a subscription.')
       }
     },
-
     async fetchSubscriptions () {
       try {
         const response = await axios.post('http://localhost:3001/get-subscriptions', {
@@ -135,6 +145,11 @@ export default {
       } catch (error) {
         console.error('Error fetching subscriptions:', error)
       }
+    },
+
+    formatDate (date) {
+      const options = { year: 'numeric', month: '2-digit', day: '2-digit' }
+      return new Date(date).toLocaleDateString('en-GB', options)
     },
 
     async removeSubscription () {
@@ -149,7 +164,7 @@ export default {
       const subscriptionId = lastSubscription._id // Get its ID
 
       try {
-        // Call the server API to remove the last subscription
+      // Call the server API to remove the last subscription
         const response = await fetch('http://localhost:3001/remove-subscription', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -159,7 +174,7 @@ export default {
         const data = await response.json()
 
         if (response.ok) {
-          // Remove from the local array after successful removal on the server
+        // Remove from the local array after successful removal on the server
           this.subscriptions.pop() // Remove the last subscription
           alert(data.message) // Show success message
         } else {
