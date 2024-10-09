@@ -55,7 +55,6 @@
                 <th class="py-2 text-left text-sm font-medium text-gray-700">Price</th>
                 <th class="py-2 text-left text-sm font-medium text-gray-700">Next Payment</th>
                 <th class="py-2 text-left text-sm font-medium text-gray-700">Plan Type</th>
-                <th class="py-2 text-left text-sm font-medium text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody>

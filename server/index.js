@@ -1,6 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const bcrypt = require('bcryptjs');
+const { hash } = require('crypto');
+
 
 const app = express();
 
@@ -29,7 +32,16 @@ const UserSchema = new mongoose.Schema({
         {
             Name: String, // Name of the expense
             Price: Number, // Price or amount of the expense
-            Date: { type: Date, default: Date.now } // Date when the expense was created
+            Date: Date
+        }
+    ],
+    Tasks: [
+        {
+            Name: String,
+            State : String,
+            Date: { type: Date, default: Date.now },
+
+
         }
     ]
 });
@@ -37,7 +49,7 @@ const UserSchema = new mongoose.Schema({
 const UserModel = mongoose.model('users', UserSchema);
 
 app.post('/login', async (req, res) => {
-    const { username, password} = req.body;
+    const { username, password } = req.body;
 
     try {
         const user = await UserModel.findOne({ username });
@@ -46,15 +58,18 @@ app.post('/login', async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Direct comparison since no encryption is used
-        if (password === user.password) {
+        // Compare the password using bcrypt
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+
+        if (isPasswordValid) {
             return res.status(200).json({
                 message: 'Login successful',
                 username: user.username,
                 fullName: user.fullName,
                 balance: user.balance,
                 expenses: user.expenses,
-                Allexpenses: user.Allexpenses // Return all expense objects
+                Allexpenses: user.Allexpenses, // Return all expense objects
+                Tasks: user.Tasks
             });
         } else {
             res.status(401).json({ message: 'Incorrect password' });
@@ -65,6 +80,7 @@ app.post('/login', async (req, res) => {
     }
 });
 
+// Register route
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
 
@@ -75,8 +91,20 @@ app.post('/register', async (req, res) => {
             return res.status(409).json({ message: 'Username already exists' });
         }
 
-        // Save new user to the database
-        const newUser = new UserModel({ username, password });
+        // Hash the password before saving
+        const hashedPassword = await bcrypt.hash(password, 10);
+        console.log('Hashed Password:', hashedPassword); // Log the hashed password
+
+        // Save new user to the database with the hashed password
+        const newUser = new UserModel({
+            username,
+            password: hashedPassword,
+            balance: 0, // Initialize balance
+            expenses: 0, // Initialize expenses
+            Subscription: [],
+            Allexpenses: [],
+            Tasks: []
+        });
         await newUser.save();
 
         res.status(201).json({ message: 'Account created successfully' });
@@ -114,7 +142,7 @@ app.post('/add-expense', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
-
+    
 app.listen(3001, () => {
     console.log('Server is running on port 3001');
 });
@@ -229,6 +257,52 @@ app.post('/get-subscriptions', async (req, res) => {
         res.status(200).json({ message: 'Subscription removed successfully' });
     } catch (error) {
         console.error(error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Get Tasks Endpoint
+app.post('/get-tasks', async (req, res) => {
+    const { username } = req.body;
+
+    try {
+        const user = await UserModel.findOne({ username });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        res.status(200).json({
+            Tasks: user.Tasks
+        });
+    } catch (error) {
+        console.error('Error fetching tasks:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Add Task Endpoint
+app.post('/add-task', async (req, res) => {
+    const { username, Task } = req.body; // Expect singular 'Task'
+
+    try {
+        const user = await UserModel.findOne({ username });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Add the new task to the user's Tasks array
+        user.Tasks.push(Task);
+
+        await user.save(); // Save the updated user
+
+        res.status(200).json({
+            message: 'Task added successfully',
+            Task: user.Tasks[user.Tasks.length - 1] // Return the newly added task
+        });
+    } catch (error) {
+        console.error('Error adding task:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });

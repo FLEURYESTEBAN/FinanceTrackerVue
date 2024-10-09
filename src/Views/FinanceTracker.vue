@@ -86,7 +86,8 @@
               <button>Go to Smart Banking</button>
             </router-link>
           </div>
-          <p class="mt-4 text-center text-gray-600">This month, you used 50% more on groceries and 20% less on family expenses.</p>
+          <p class="mt-4 text-center text-gray-600">To get informations about your spendings
+          </p>
         </div>
       </section>
 

@@ -35,7 +35,7 @@
         <!-- Expense Description -->
         <div class="bg-gray-100 rounded-xl p-6 mx-10 text-center shadow-md">
           <p class="text-lg text-gray-800">
-            This month, you used <span class="font-bold">50%</span> more on groceries and <span class="font-bold">20%</span> less on family expenses.
+            This month you used the most money between the <span class="font-bold">15th</span> and the <span class="font-bold">25th</span>.
           </p>
         </div>
 
@@ -78,7 +78,7 @@ export default {
   data () {
     return {
       localTotalExpenses: this.totalExpenses, // Create a local copy of the prop
-      lastMonthExpenses: 10000 // Set last month's expenses (this can be dynamic)
+      lastMonthExpenses: 5000 // Set last month's expenses (this can be dynamic)
     }
   },
   computed: {
@@ -128,10 +128,10 @@ export default {
       this.chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+          labels: ['5', '10', '15', '20', '25', '30'],
           datasets: [{
-            label: 'Monthly Expenses',
-            data: [1200, 1900, 3000, 2500, 2800, 2300], // Sample data for expenses
+            label: 'Expenses of the month',
+            data: [29, 150, 3000, 700, 2500, 25], // Sample data for expenses
             borderColor: 'rgba(75, 192, 192, 1)',
             backgroundColor: 'rgba(75, 192, 192, 0.2)',
             fill: true,

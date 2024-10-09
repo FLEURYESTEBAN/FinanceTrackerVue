@@ -39,6 +39,12 @@
 
 <script>
 export default {
+  mounted () {
+    const fullName = this.$route.query.fullName
+    if (fullName) {
+      localStorage.setItem('fullName', fullName) // Store fullName in localStorage
+    }
+  },
   data () {
     return {
       credentials: {
