@@ -90,13 +90,20 @@
           </p>
         </div>
       </section>
-
+      <div class="bg-gray-100 p-6 rounded-lg shadow-md mt-7">
+          <div class="text-center text-lg font-semibold text-gray-800">
+            <router-link to="/Tasks">
+              <button>Your tasks</button>
+            </router-link>
+          </div>
+          </div>
       <!-- Footer -->
       <footer class="mt-10 text-center text-gray-500">
         <p class="text-sm">&copy; 2024 Fleury Menard Chartier Luce-Laurent</p>
       </footer>
     </main>
   </div>
+
 </template>
 
 <script>

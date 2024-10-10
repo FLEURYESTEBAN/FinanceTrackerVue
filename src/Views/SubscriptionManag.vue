@@ -147,11 +147,6 @@ export default {
       }
     },
 
-    formatDate (date) {
-      const options = { year: 'numeric', month: '2-digit', day: '2-digit' }
-      return new Date(date).toLocaleDateString('en-GB', options)
-    },
-
     async removeSubscription () {
       const username = localStorage.getItem('username') // Get the logged-in user's username
 

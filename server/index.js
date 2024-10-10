@@ -313,3 +313,43 @@ app.post('/add-task', async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 });
+
+app.post('/remove-task', async (req, res) => {
+    const { username, taskName } = req.body;
+
+    try {
+        const user = await UserModel.findOne({ username });
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Find the index of the task to remove
+        const taskIndex = user.Tasks.findIndex(task => task.Name === taskName);
+
+        if (taskIndex === -1) {
+            return res.status(404).json({ message: 'Task not found' });
+        }
+
+        // Remove the task from the array
+        user.Tasks.splice(taskIndex, 1);
+
+        await user.save(); // Save the updated user
+
+        res.status(200).json({ message: 'Task removed successfully' });
+    } catch (error) {
+        console.error('Error removing task:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+app.post('/update-task-status', async (req, res) => {
+    const { username, taskName, newStatus } = req.body;
+    try {
+      // Your logic for updating the task
+      // For example, find the user and update the task status
+    } catch (error) {
+      console.error('Error updating task:', error);
+      return res.status(500).json({ message: 'Error updating task', error: error.message });
+    }
+  });

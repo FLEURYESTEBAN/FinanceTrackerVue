@@ -81,6 +81,10 @@ export default {
         alert('Password must contain at least 8 characters and one number.')
         return
       }
+      if (!this.credentials.username || !this.credentials.password) {
+        alert('Username and password cannot be empty.')
+        return
+      }
 
       try {
         const response = await fetch('http://localhost:3001/register', {
