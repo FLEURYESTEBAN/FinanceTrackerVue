@@ -1,4 +1,4 @@
-# Finance tracker app to track your expanses !
+# Finance tracker website to track your expanses !
 
 ## Project setup
 ```
