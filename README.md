@@ -1,4 +1,4 @@
-# testing
+# Finance tracker app to track your expanses !
 
 ## Project setup
 ```
